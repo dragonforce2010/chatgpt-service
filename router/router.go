@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/dragonforce2010/chatgpt-service/domain/chat"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,6 +19,11 @@ func NewRouter(chatRouter *chat.ChatRouter, chatHandler *chat.ChatHandler) *Rout
 
 func (r *Router) InitRoutes() {
 	r.router = gin.Default()
+	r.router.Use(cors.New(cors.Config{
+		AllowAllOrigins:        true,
+		AllowMethods:           []string{"POST"},
+		AllowCredentials:       true,
+	}))
 	r.chatRouter.Init(r.router)
 }
 
