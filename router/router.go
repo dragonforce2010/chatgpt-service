@@ -21,7 +21,8 @@ func (r *Router) InitRoutes() {
 	r.router = gin.Default()
 	r.router.Use(cors.New(cors.Config{
 		AllowAllOrigins:        true,
-		AllowMethods:           []string{"POST"},
+		AllowMethods:           []string{"POST", "GET","PUT","DELETE","OPTIONS"},
+		AllowHeaders:           []string{"Content-Type", "Access-Control-Allow-Headers", "Authorization", "X-Requested-With"},
 		AllowCredentials:       true,
 	}))
 	r.chatRouter.Init(r.router)
