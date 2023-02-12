@@ -2,8 +2,8 @@ package router
 
 import (
 	"github.com/dragonforce2010/chatgpt-service/domain/chat"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type Router struct {
@@ -17,15 +17,36 @@ func NewRouter(chatRouter *chat.ChatRouter, chatHandler *chat.ChatHandler) *Rout
 	}
 }
 
+// 处理跨域请求,支持options访问
+func Cors() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		method := c.Request.Method
+
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
+		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+		c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
+		c.Header("Access-Control-Allow-Credentials", "true")
+
+		//放行所有OPTIONS方法
+		if method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusNoContent)
+		}
+		// 处理请求
+		c.Next()
+	}
+}
+
 func (r *Router) InitRoutes() {
 	r.router = gin.Default()
-	r.router.Use(cors.New(cors.Config{
-		AllowAllOrigins:        true,
-		AllowOrigins: 	 		[]string{"*"},
-		AllowMethods:           []string{"POST", "GET","PUT","DELETE","OPTIONS"},
-		AllowHeaders:           []string{"Origin", "Content-Length", "Content-Type", "Access-Control-Allow-Headers", "Authorization", "X-Requested-With"},
-		AllowCredentials:       true,
-	}))
+	r.router.Use(Cors())
+	//r.router.Use(cors.New(cors.Config{
+	//	AllowAllOrigins:        true,
+	//	AllowOrigins: 	 		[]string{"*"},
+	//	AllowMethods:           []string{"POST", "GET","PUT","DELETE","OPTIONS"},
+	//	AllowHeaders:           []string{"Origin", "Content-Length", "Content-Type", "Access-Control-Allow-Headers", "Authorization", "X-Requested-With"},
+	//	AllowCredentials:       true,
+	//}))
 	r.chatRouter.Init(r.router)
 }
 
