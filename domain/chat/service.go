@@ -2,6 +2,7 @@ package chat
 
 import (
 	"fmt"
+
 	"github.com/PullRequestInc/go-gpt3"
 	"github.com/dragonforce2010/chatgpt-service/client"
 	"github.com/gin-gonic/gin"
@@ -16,10 +17,10 @@ func NewChatService(client *client.Client) *ChatService {
 }
 
 func (c *ChatService) GetChatResponse(ctx *gin.Context, chatMessage string) (string, error) {
-	var maxToken = 4000
+	var maxToken = 3000
 	resp, err := c.client.GptClient.CompletionWithEngine(ctx, gpt3.TextDavinci003Engine, gpt3.CompletionRequest{
-		Prompt:      []string{chatMessage},
-		MaxTokens:   &maxToken,
+		Prompt:    []string{chatMessage},
+		MaxTokens: &maxToken,
 	})
 
 	if err != nil || resp.Choices == nil {
