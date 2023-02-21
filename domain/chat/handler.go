@@ -2,9 +2,13 @@ package chat
 
 import (
 	"fmt"
+
 	"github.com/dragonforce2010/chatgpt-service/constant"
 	"github.com/gin-gonic/gin"
 )
+
+const prompt_prefix = "ask:\n"
+const prompt_postfix = "answer:"
 
 type ChatHandler struct {
 	chatService *ChatService
@@ -22,7 +26,11 @@ func (ch *ChatHandler) HandleChat(c *gin.Context) {
 	}
 
 	fmt.Println("Received a request: ", chatGptRequest)
-	respMessage, err := ch.chatService.GetChatResponse(c, chatGptRequest.Message)
+	respMessage, err := ch.chatService.GetChatResponse(c,
+		prompt_prefix+
+			chatGptRequest.Context+
+			chatGptRequest.Message+
+			prompt_postfix)
 	if err != nil {
 		c.JSON(constant.HTTPStatusCodeInternalError, ChatGptResponse{
 			Content: "",
@@ -33,5 +41,6 @@ func (ch *ChatHandler) HandleChat(c *gin.Context) {
 
 	c.JSON(constant.HTTPStatusCodeSuccess, ChatGptResponse{
 		Content: respMessage,
+		Context: chatGptRequest.Context + chatGptRequest.Message + "\n",
 	})
 }

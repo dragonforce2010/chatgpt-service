@@ -16,7 +16,7 @@ func NewChatService(client *client.Client) *ChatService {
 }
 
 func (c *ChatService) GetChatResponse(ctx *gin.Context, chatMessage string) (string, error) {
-	var maxToken = 2000
+	var maxToken = 4000
 	resp, err := c.client.GptClient.CompletionWithEngine(ctx, gpt3.TextDavinci003Engine, gpt3.CompletionRequest{
 		Prompt:      []string{chatMessage},
 		MaxTokens:   &maxToken,
