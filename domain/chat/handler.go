@@ -26,11 +26,13 @@ func (ch *ChatHandler) HandleChat(c *gin.Context) {
 	}
 
 	fmt.Println("Received a request: ", chatGptRequest)
-	respMessage, err := ch.chatService.GetChatResponse(c,
-		prompt_prefix+
-			chatGptRequest.Context+
-			chatGptRequest.Message+
-			prompt_postfix)
+	prompt := prompt_prefix +
+		chatGptRequest.Context +
+		chatGptRequest.Message +
+		prompt_postfix
+	fmt.Printf("prompt: %v\n", prompt)
+
+	respMessage, err := ch.chatService.GetChatResponse(c, prompt)
 	if err != nil {
 		c.JSON(constant.HTTPStatusCodeInternalError, ChatGptResponse{
 			Content: "",

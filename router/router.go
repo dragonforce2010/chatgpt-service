@@ -49,7 +49,7 @@ func (r *Router) InitRoutes() {
 	//	AllowCredentials:       true,
 	//}))
 	r.chatRouter.Init(r.router)
-	r.router.GET("/ping", func(c *gin.Context) {
+	r.router.GET("/api/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
 }
