@@ -1,0 +1,42 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: ghcr.io/dragonforce2010/chatgpt-service
+  TAG: latestgs
+  DOCKER_USERNAME: dragonforce2010
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+jobs: 
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Login to Github Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: dragonforce2010
+          password: ${{ env.DOCKER_PASSWORD }}
+      - name: Build Docker image
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: .
+          file: Dockerfile
+          tags: ${{ env.IMAGE_NAME }}:${{ env.TAG }}, ${{ env.IMAGE_NAME }}:latest
+      # - name: Trigger deployment webhook 
+      #   if: success()
+      #   env:
+      #     WEBHOOK_URL: https://ec2-54-254-24-184.ap-southeast-1.compute.amazonaws.com/api/stacks/webhooks/1a727bc0-3a53-429f-b03a-4539d56d4ab1
+      #     IMAGE_NAME: ${{ env.IMAGE_NAME }}
+      #     TAG: ${{ env.TAG }}
+      #   run: |
+      #     curl -X POST -H "Content-Type: application/json" \
+      #       -d "{\"image\": \"$IMAGE_NAME:$TAG\"}" \
+      #       $WEBHOOK_URL

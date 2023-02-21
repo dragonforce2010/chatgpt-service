@@ -1,9 +1,10 @@
 package router
 
 import (
+	"net/http"
+
 	"github.com/dragonforce2010/chatgpt-service/domain/chat"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type Router struct {
@@ -48,6 +49,9 @@ func (r *Router) InitRoutes() {
 	//	AllowCredentials:       true,
 	//}))
 	r.chatRouter.Init(r.router)
+	r.router.GET("/ping", func(c *gin.Context) {
+		c.String(http.StatusOK, "pong")
+	})
 }
 
 func (r *Router) Run(address string) {
