@@ -29,14 +29,14 @@ func (ch *ChatHandler) HandleChat(c *gin.Context) {
 
 	model := c.Request.URL.Query().Get("model")
 	if strings.TrimSpace(model) == "" {
-		model = gogpt.GPT3Ada
+		model = gogpt.GPT3TextDavinci003
 	}
 
 	fmt.Println("Received a request: ", chatGptRequest)
 	prompt := prompt_context_prefix + chatGptRequest.Context +
 		prompt_question_prefix + chatGptRequest.Message + "\n"
 
-	fmt.Printf("prompt: %v\n", prompt)
+	fmt.Printf("current prompt: %v\n", prompt)
 
 	respMessage, err := ch.chatService.GetChatResponse(c, prompt, model)
 	if err != nil {
