@@ -18,10 +18,12 @@ func NewChatService(client *client.Client) *ChatService {
 
 func (c *ChatService) GetChatResponse(ctx *gin.Context, prompt string) (string, error) {
 	var maxToken int = 3000
-	resp, err := c.client.GptClient.CreateCompletion(ctx, gogpt.CompletionRequest{
+	client := c.client.GetRandomOneClient()
+	resp, err := client.CreateCompletion(ctx, gogpt.CompletionRequest{
 		Prompt:    prompt,
 		Suffix:    "",
 		MaxTokens: maxToken,
+		Model:     gogpt.GPT3Ada,
 	})
 
 	if err != nil || resp.Choices == nil {
