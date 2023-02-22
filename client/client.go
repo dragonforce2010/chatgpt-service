@@ -1,17 +1,17 @@
 package client
 
 import (
-	"github.com/PullRequestInc/go-gpt3"
-	"github.com/dragonforce2010/chatgpt-service/constant"
 	"os"
 	"sync"
+
+	"github.com/dragonforce2010/chatgpt-service/constant"
+	gpt3 "github.com/sashabaranov/go-gpt3"
 )
 
 var once sync.Once
 
 type Client struct {
-	GptClient gpt3.Client
-	apiKey    string
+	GptClient *gpt3.Client
 }
 
 func NewClient() *Client {

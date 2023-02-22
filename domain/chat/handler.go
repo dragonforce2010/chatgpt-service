@@ -2,14 +2,13 @@ package chat
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/dragonforce2010/chatgpt-service/constant"
 	"github.com/gin-gonic/gin"
 )
 
-// const prompt_prefix = "ask:\n"
-// const prompt_postfix = "answer:\n"
+const prompt_prefix = "ask:\n"
+const prompt_postfix = "answer:\n"
 
 type ChatHandler struct {
 	chatService *ChatService
@@ -27,11 +26,10 @@ func (ch *ChatHandler) HandleChat(c *gin.Context) {
 	}
 
 	fmt.Println("Received a request: ", chatGptRequest)
-	// prompt := prompt_prefix +
-	// 	chatGptRequest.Context + "\n" +
-	// 	chatGptRequest.Message + "\n" +
-	// 	prompt_postfix
-	prompt := append(strings.Split(chatGptRequest.Context, "\n"), chatGptRequest.Message)
+	prompt := prompt_prefix +
+		chatGptRequest.Context + "\n" +
+		chatGptRequest.Message + "\n" +
+		prompt_postfix
 	fmt.Printf("prompt: %v\n", prompt)
 
 	respMessage, err := ch.chatService.GetChatResponse(c, prompt)
