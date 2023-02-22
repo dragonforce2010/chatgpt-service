@@ -8,7 +8,7 @@ import (
 )
 
 const prompt_prefix = "ask:\n"
-const prompt_postfix = "answer:"
+const prompt_postfix = "answer:\n"
 
 type ChatHandler struct {
 	chatService *ChatService
@@ -27,8 +27,8 @@ func (ch *ChatHandler) HandleChat(c *gin.Context) {
 
 	fmt.Println("Received a request: ", chatGptRequest)
 	prompt := prompt_prefix +
-		chatGptRequest.Context +
-		chatGptRequest.Message +
+		chatGptRequest.Context + "\n" +
+		chatGptRequest.Message + "\n" +
 		prompt_postfix
 	fmt.Printf("prompt: %v\n", prompt)
 
