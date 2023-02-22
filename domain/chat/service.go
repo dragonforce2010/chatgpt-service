@@ -23,7 +23,7 @@ func (c *ChatService) GetChatResponse(ctx *gin.Context, prompt string) (string, 
 		Prompt:    prompt,
 		Suffix:    "",
 		MaxTokens: maxToken,
-		Model:     gogpt.GPT3Ada,
+		Model:     gogpt.GPT3TextDavinci003,
 	})
 
 	if err != nil || resp.Choices == nil {
