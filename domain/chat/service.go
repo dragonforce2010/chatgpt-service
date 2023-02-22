@@ -16,14 +16,15 @@ func NewChatService(client *client.Client) *ChatService {
 	return &ChatService{client: client}
 }
 
-func (c *ChatService) GetChatResponse(ctx *gin.Context, prompt string) (string, error) {
+func (c *ChatService) GetChatResponse(ctx *gin.Context, prompt string, model string) (string, error) {
 	var maxToken int = 3000
 	client := c.client.GetRandomOneClient()
 	resp, err := client.CreateCompletion(ctx, gogpt.CompletionRequest{
 		Prompt:    prompt,
 		Suffix:    "",
 		MaxTokens: maxToken,
-		Model:     gogpt.GPT3TextDavinci003,
+		Model:     model,
+		// Model:     gogpt.GPT3TextDavinci003,
 	})
 
 	if err != nil || resp.Choices == nil {
