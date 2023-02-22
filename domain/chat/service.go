@@ -17,7 +17,10 @@ func NewChatService(client *client.Client) *ChatService {
 }
 
 func (c *ChatService) GetChatResponse(ctx *gin.Context, prompt string, model string) (string, error) {
-	var maxToken int = 3000
+	var maxToken int = 1500
+	if model == gogpt.GPT3TextDavinci003 {
+		maxToken = 3000
+	}
 	client := c.client.GetRandomOneClient()
 	resp, err := client.CreateCompletion(ctx, gogpt.CompletionRequest{
 		Prompt:    prompt,
