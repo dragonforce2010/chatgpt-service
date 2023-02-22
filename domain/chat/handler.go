@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const prompt_prefix = "ask:\n"
-const prompt_postfix = "answer:\n"
+const prompt_context_prefix = "The conversaction context:"
+const prompt_question_prefix = "Now please only answer my current question:\n"
 
 type ChatHandler struct {
 	chatService *ChatService
@@ -26,10 +26,9 @@ func (ch *ChatHandler) HandleChat(c *gin.Context) {
 	}
 
 	fmt.Println("Received a request: ", chatGptRequest)
-	prompt := prompt_prefix +
-		chatGptRequest.Context + "\n" +
-		chatGptRequest.Message + "\n" +
-		prompt_postfix
+	prompt := prompt_context_prefix + chatGptRequest.Context +
+		prompt_question_prefix + chatGptRequest.Message + "\n"
+
 	fmt.Printf("prompt: %v\n", prompt)
 
 	respMessage, err := ch.chatService.GetChatResponse(c, prompt)
