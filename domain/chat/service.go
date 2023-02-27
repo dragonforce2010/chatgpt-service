@@ -38,7 +38,7 @@ func (*ChatService) getChatResponse(client *gogpt.Client, ctx *gin.Context, prom
 		Suffix:           "",
 		MaxTokens:        maxToken,
 		Model:            model,
-		Stop:             []string{prompt_context_prefix, prompt_question_prefix, prompt_question_postfix},
+		Stop:             []string{prompt_question_prefix, prompt_question_postfix},
 		Temperature:      temperature,
 		PresencePenalty:  presencePenalty,
 		FrequencyPenalty: frequencyPenalty,
