@@ -15,5 +15,6 @@ func NewChatRouter(chatHandler *ChatHandler) *ChatRouter {
 }
 
 func (cr *ChatRouter) Init(router *gin.Engine) {
-	router.POST("/api/chat", cr.handler.HandleChat)
+	router.POST("/api/chat/v1", cr.handler.HandleChat)
+	router.POST("/api/chat/v2", cr.handler.HandleChat)
 }
