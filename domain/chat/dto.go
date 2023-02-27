@@ -1,12 +1,14 @@
 package chat
 
 type ChatGptResponse struct {
-	Content        string `json:"content"`
-	Context        string `json:"context"`
-	Error          string `json:"error"`
+	Content string `json:"content"`
+	Context string `json:"context"`
+	Error   string `json:"error"`
 }
 
 type ChatGptRequest struct {
-	Message        string `json:"message"`
-	Context        string `json:"context"`
+	Message   string `json:"message"`
+	Context   string `json:"context"`
+	Model     string `json:"model"`
+	OpenAiKey string `json:"openAiKey"`
 }

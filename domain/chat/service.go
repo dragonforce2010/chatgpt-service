@@ -19,10 +19,20 @@ func NewChatService(client *client.Client) *ChatService {
 	return &ChatService{client: client}
 }
 
-func (c *ChatService) GetChatResponse(ctx *gin.Context, prompt string, model string) (string, error) {
+func (c *ChatService) Chat(ctx *gin.Context, client *gogpt.Client, prompt string, model string, useClientPool bool) (string, error) {
 	maxToken, temperature, presencePenalty, frequencyPenalty := c.initParams(model)
 
-	client := c.client.GetRandomOneClient()
+	if !useClientPool && client == nil {
+		return "", fmt.Errorf("GptClient is nil")
+	}
+
+	if useClientPool {
+		client = c.client.GetRandomOneClient()
+	}
+	return c.getChatResponse(client, ctx, prompt, maxToken, model, temperature, presencePenalty, frequencyPenalty)
+}
+
+func (*ChatService) getChatResponse(client *gogpt.Client, ctx *gin.Context, prompt string, maxToken int, model string, temperature float32, presencePenalty float32, frequencyPenalty float32) (string, error) {
 	resp, err := client.CreateCompletion(ctx, gogpt.CompletionRequest{
 		Prompt:           prompt,
 		Suffix:           "",
@@ -32,7 +42,6 @@ func (c *ChatService) GetChatResponse(ctx *gin.Context, prompt string, model str
 		Temperature:      temperature,
 		PresencePenalty:  presencePenalty,
 		FrequencyPenalty: frequencyPenalty,
-		// Model:     gogpt.GPT3TextDavinci003,
 	})
 
 	if err != nil || resp.Choices == nil {
