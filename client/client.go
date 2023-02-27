@@ -1,8 +1,10 @@
 package client
 
 import (
+	"fmt"
 	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -23,14 +25,20 @@ func NewClient() *Client {
 
 func (c *Client) initClient() *Client {
 	once.Do(func() {
-		openaiAPIKeyString := os.Getenv(constant.OpenaiApiKey)
+		openaiKeyCount, err := strconv.ParseInt(os.Getenv(constant.OPENAPI_PAI_KEY_COUNT), 10, 32)
 
-		if openaiAPIKeyString == "" {
-			panic("Failed to get open ai api key")
+		if err != nil {
+			panic(err)
 		}
 
-		for _, key := range strings.Split(openaiAPIKeyString, ",") {
-			c.ClientsPool = append(c.ClientsPool, gpt3.NewClient(strings.TrimSpace(key)))
+		for i := 1; i <= int(openaiKeyCount); i++ {
+			openAiKey := os.Getenv(constant.OPEN_AI_API_KEY_PREFIX + strconv.Itoa(i))
+
+			if strings.TrimSpace(openAiKey) == "" {
+				panic("OpenAiKey is not valid!")
+			}
+			c.ClientsPool = append(c.ClientsPool, gpt3.NewClient(openAiKey))
+			fmt.Println("successfully initialized one gpt client with key", openAiKey[:8])
 		}
 	})
 	return c
