@@ -34,11 +34,11 @@ func (c *ChatService) Chat(ctx *gin.Context, client *gogpt.Client, prompt string
 
 func (*ChatService) getChatResponse(client *gogpt.Client, ctx *gin.Context, prompt string, maxToken int, model string, temperature float32, presencePenalty float32, frequencyPenalty float32) (string, error) {
 	resp, err := client.CreateCompletion(ctx, gogpt.CompletionRequest{
-		Prompt:    prompt,
-		Suffix:    "",
-		MaxTokens: maxToken,
-		Model:     model,
-		// Stop:             []string{prompt_question_prefix, prompt_question_postfix},
+		Prompt:           prompt,
+		Suffix:           "",
+		MaxTokens:        maxToken,
+		Model:            model,
+		Stop:             []string{prompt_question_prefix, prompt_question_postfix},
 		Temperature:      temperature,
 		PresencePenalty:  presencePenalty,
 		FrequencyPenalty: frequencyPenalty,

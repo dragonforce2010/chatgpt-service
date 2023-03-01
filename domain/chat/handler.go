@@ -10,8 +10,8 @@ import (
 )
 
 const prompt_context_prefix = "Context:"
-const prompt_question_prefix = "Only Answer This:"
-// const prompt_question_postfix = "AI:"
+const prompt_question_prefix = "Human:"
+const prompt_question_postfix = "AI:"
 
 type ChatHandler struct {
 	chatService *ChatService
@@ -42,8 +42,8 @@ func (ch *ChatHandler) HandleChatV1(c *gin.Context) {
 
 	fmt.Println("Received a request: ", chatGptRequest)
 	prompt := prompt_context_prefix + chatGptRequest.Context +
-		prompt_question_prefix + chatGptRequest.Message + "\n"
-		// prompt_question_postfix + "\n"
+		prompt_question_prefix + chatGptRequest.Message + "\n" +
+		prompt_question_postfix + "\n"
 
 	fmt.Printf("current prompt: %v\n", prompt)
 
@@ -77,8 +77,8 @@ func (ch *ChatHandler) HandleChatV2(c *gin.Context) {
 
 	fmt.Println("Received a request: ", chatGptRequest)
 	prompt := prompt_context_prefix + chatGptRequest.Context +
-		prompt_question_prefix + chatGptRequest.Message + "\n" 
-		// prompt_question_postfix
+		prompt_question_prefix + chatGptRequest.Message + "\n" +
+		prompt_question_postfix
 
 	fmt.Printf("current prompt: %v\n", prompt)
 
