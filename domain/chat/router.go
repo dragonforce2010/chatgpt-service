@@ -15,6 +15,8 @@ func NewChatRouter(chatHandler *ChatHandler) *ChatRouter {
 }
 
 func (cr *ChatRouter) Init(router *gin.Engine) {
+	// 使用自己的open ai key
 	router.POST("/api/chat/v1", cr.handler.HandleChatV1)
+	// 使用public open api key pool
 	router.POST("/api/chat/v2", cr.handler.HandleChatV2)
 }

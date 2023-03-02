@@ -1,5 +1,7 @@
 package chat
 
+import gogpt "github.com/sashabaranov/go-gpt3"
+
 type ChatGptResponse struct {
 	Content string `json:"content"`
 	Context string `json:"context"`
@@ -7,8 +9,9 @@ type ChatGptResponse struct {
 }
 
 type ChatGptRequest struct {
-	Message   string `json:"message"`
-	Context   string `json:"context"`
-	Model     string `json:"model"`
-	OpenAiKey string `json:"openAiKey"`
+	Message    string                        `json:"message,omitempty"`
+	Context    string                        `json:"context,omitempty"`
+	Model      string                        `json:"model,omitempty"`
+	OpenAiKey  string                        `json:"openAiKey,omitempty"`
+	MsgHistory []gogpt.ChatCompletionMessage `json:"-"`
 }

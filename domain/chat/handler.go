@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -9,9 +10,8 @@ import (
 	gogpt "github.com/sashabaranov/go-gpt3"
 )
 
-const prompt_context_prefix = "Context:"
-const prompt_question_prefix = "Human:"
-const prompt_question_postfix = "AI:"
+const ROLE_AI = "AI"
+const ROLE_USER = "USER"
 
 type ChatHandler struct {
 	chatService *ChatService
@@ -22,16 +22,11 @@ func NewChatHandler(chatService *ChatService) *ChatHandler {
 }
 
 func (ch *ChatHandler) HandleChatV1(c *gin.Context) {
-	var chatGptRequest ChatGptRequest
-	err := c.BindJSON(&chatGptRequest)
+	chatGptRequest, err := ch.parseRequest(c)
 	if err != nil {
 		c.JSON(constant.HTTPStatusCodeBadRequest, "Invalid request parameter")
+		fmt.Println("error happed: ", err.Error())
 		return
-	}
-
-	model := gogpt.GPT3TextDavinci003
-	if len(chatGptRequest.Model) != 0 {
-		model = chatGptRequest.Model
 	}
 
 	openAiKey := strings.TrimSpace(chatGptRequest.OpenAiKey)
@@ -40,14 +35,16 @@ func (ch *ChatHandler) HandleChatV1(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("Received a request: ", chatGptRequest)
-	prompt := prompt_context_prefix + chatGptRequest.Context +
-		prompt_question_prefix + chatGptRequest.Message + "\n" +
-		prompt_question_postfix + "\n"
+	messages, respMessage, err := ch.sendChatRequest(chatGptRequest, c)
+	if err != nil {
+		fmt.Println("error happed", err.Error())
+		c.JSON(constant.HTTPStatusCodeInternalError, ChatGptResponse{
+			Content: "",
+			Error:   err.Error(),
+		})
+	}
 
-	fmt.Printf("current prompt: %v\n", prompt)
-
-	respMessage, err := ch.chatService.Chat(c, gogpt.NewClient(openAiKey), prompt, model, false)
+	context, err := ch.parseResponse(messages, respMessage, c)
 	if err != nil {
 		c.JSON(constant.HTTPStatusCodeInternalError, ChatGptResponse{
 			Content: "",
@@ -58,31 +55,28 @@ func (ch *ChatHandler) HandleChatV1(c *gin.Context) {
 
 	c.JSON(constant.HTTPStatusCodeSuccess, ChatGptResponse{
 		Content: respMessage,
-		Context: chatGptRequest.Context + chatGptRequest.Message + "\n",
+		Context: context,
 	})
 }
 
 func (ch *ChatHandler) HandleChatV2(c *gin.Context) {
-	var chatGptRequest ChatGptRequest
-	err := c.BindJSON(&chatGptRequest)
+	chatGptRequest, err := ch.parseRequest(c)
 	if err != nil {
 		c.JSON(constant.HTTPStatusCodeBadRequest, "Invalid request parameter")
+		fmt.Println("error happed: ", err.Error())
 		return
 	}
 
-	model := c.Request.URL.Query().Get("model")
-	if strings.TrimSpace(model) == "" {
-		model = gogpt.GPT3TextDavinci003
+	messages, respMessage, err := ch.sendChatRequest(chatGptRequest, c)
+	if err != nil {
+		fmt.Println("error happed", err.Error())
+		c.JSON(constant.HTTPStatusCodeInternalError, ChatGptResponse{
+			Content: "",
+			Error:   err.Error(),
+		})
 	}
 
-	fmt.Println("Received a request: ", chatGptRequest)
-	prompt := prompt_context_prefix + chatGptRequest.Context +
-		prompt_question_prefix + chatGptRequest.Message + "\n" +
-		prompt_question_postfix
-
-	fmt.Printf("current prompt: %v\n", prompt)
-
-	respMessage, err := ch.chatService.Chat(c, nil, prompt, model, true)
+	context, err := ch.parseResponse(messages, respMessage, c)
 	if err != nil {
 		c.JSON(constant.HTTPStatusCodeInternalError, ChatGptResponse{
 			Content: "",
@@ -93,6 +87,65 @@ func (ch *ChatHandler) HandleChatV2(c *gin.Context) {
 
 	c.JSON(constant.HTTPStatusCodeSuccess, ChatGptResponse{
 		Content: respMessage,
-		Context: chatGptRequest.Context + chatGptRequest.Message + "\n",
+		Context: context,
 	})
+}
+
+func (*ChatHandler) parseResponse(messages []gogpt.ChatCompletionMessage, respMessage string, c *gin.Context) (string, error) {
+	messages = append(messages, gogpt.ChatCompletionMessage{
+		Role:    ROLE_AI,
+		Content: respMessage,
+	})
+
+	context, err := json.Marshal(messages)
+	if err != nil {
+		return "", err
+	}
+	return string(context), nil
+}
+
+func (ch *ChatHandler) sendChatRequest(chatGptRequest ChatGptRequest, c *gin.Context) ([]gogpt.ChatCompletionMessage, string, error) {
+	messages := ch.genChatMessages(chatGptRequest)
+
+	respMessage, err := ch.chatService.Chat(c, nil, messages, chatGptRequest.Model, true)
+	if err != nil {
+		fmt.Println("error heppened", err.Error())
+		return messages, "", err
+	}
+	return messages, respMessage, nil
+}
+
+func (*ChatHandler) genChatMessages(chatGptRequest ChatGptRequest) []gogpt.ChatCompletionMessage {
+	messages := append(chatGptRequest.MsgHistory, gogpt.ChatCompletionMessage{
+		Role:    ROLE_USER,
+		Content: chatGptRequest.Message,
+	})
+
+	messages = messages[len(messages)-20:]
+	return messages
+}
+
+func (*ChatHandler) parseRequest(c *gin.Context) (ChatGptRequest, error) {
+	var chatGptRequest ChatGptRequest
+	err := c.BindJSON(&chatGptRequest)
+	if err != nil {
+		fmt.Println("error happed: ", err.Error())
+	}
+	fmt.Println("Received a request: ", chatGptRequest)
+
+	model := c.Request.URL.Query().Get("model")
+	if strings.TrimSpace(model) == "" {
+		model = gogpt.GPT3Dot5Turbo
+	}
+	chatGptRequest.Model = model
+
+	// var msgHistory []gogpt.ChatCompletionMessage
+	err = json.Unmarshal([]byte(chatGptRequest.Context), &chatGptRequest.MsgHistory)
+	if err != nil {
+		fmt.Println("error happed: ", err.Error())
+	}
+
+	fmt.Printf("current message: %v\n", chatGptRequest.Context)
+
+	return chatGptRequest, err
 }
