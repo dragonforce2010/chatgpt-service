@@ -10,8 +10,8 @@ import (
 	gogpt "github.com/sashabaranov/go-gpt3"
 )
 
-const ROLE_AI = "AI"
-const ROLE_USER = "USER"
+const ROLE_AI = "assistant"
+const ROLE_USER = "user"
 const MAX_CONTEXT_SIZE = 20
 
 type ChatHandler struct {
