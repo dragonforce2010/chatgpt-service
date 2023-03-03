@@ -33,6 +33,7 @@ func (c *ChatService) Chat(ctx *gin.Context, client *gogpt.Client, messages []go
 }
 
 func (*ChatService) getChatResponse(client *gogpt.Client, ctx *gin.Context, messages []gogpt.ChatCompletionMessage, maxToken int, model string, temperature float32, presencePenalty float32, frequencyPenalty float32) (string, error) {
+	fmt.Printf("model parameters - modelName: %v, maxToken: %v, temperature: %v, presencePenalty: %v, frequencyPenalty: %v\n", model, maxToken, temperature, presencePenalty, frequencyPenalty)
 	resp, err := client.CreateChatCompletion(ctx, gogpt.ChatCompletionRequest{
 		Model:            model,
 		Messages:         messages,

@@ -139,11 +139,13 @@ func (*ChatHandler) parseRequest(c *gin.Context) (ChatGptRequest, error) {
 	}
 	fmt.Println("Received a request: ", chatGptRequest)
 
-	model := c.Request.URL.Query().Get("model")
-	if strings.TrimSpace(model) == "" {
-		model = gogpt.GPT3Dot5Turbo
+	if len(chatGptRequest.Model) == 0 {
+		model := c.Request.URL.Query().Get("model")
+		if strings.TrimSpace(model) == "" {
+			model = gogpt.GPT3Dot5Turbo
+		}
+		chatGptRequest.Model = model
 	}
-	chatGptRequest.Model = model
 
 	// var msgHistory []gogpt.ChatCompletionMessage
 	fmt.Printf("current message: %v\n", chatGptRequest.Context)
