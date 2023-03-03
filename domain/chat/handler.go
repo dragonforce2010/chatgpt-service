@@ -12,6 +12,7 @@ import (
 
 const ROLE_AI = "AI"
 const ROLE_USER = "USER"
+const MAX_CONTEXT_SIZE = 20
 
 type ChatHandler struct {
 	chatService *ChatService
@@ -121,7 +122,12 @@ func (*ChatHandler) genChatMessages(chatGptRequest ChatGptRequest) []gogpt.ChatC
 		Content: chatGptRequest.Message,
 	})
 
-	messages = messages[len(messages)-20:]
+	start := 0
+	if len(messages) > MAX_CONTEXT_SIZE {
+		start = len(messages) - MAX_CONTEXT_SIZE
+	}
+
+	messages = messages[start:]
 	return messages
 }
 
