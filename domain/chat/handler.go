@@ -140,12 +140,14 @@ func (*ChatHandler) parseRequest(c *gin.Context) (ChatGptRequest, error) {
 	chatGptRequest.Model = model
 
 	// var msgHistory []gogpt.ChatCompletionMessage
-	err = json.Unmarshal([]byte(chatGptRequest.Context), &chatGptRequest.MsgHistory)
-	if err != nil {
-		fmt.Println("error happed: ", err.Error())
-	}
+	if len(chatGptRequest.Context) == 0 {
+		err = json.Unmarshal([]byte(chatGptRequest.Context), &chatGptRequest.MsgHistory)
+		if err != nil {
+			fmt.Println("error happed: ", err.Error())
+		}
 
-	fmt.Printf("current message: %v\n", chatGptRequest.Context)
+		fmt.Printf("current message: %v\n", chatGptRequest.Context)
+	}
 
 	return chatGptRequest, err
 }
