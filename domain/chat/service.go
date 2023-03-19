@@ -65,7 +65,7 @@ func (*ChatService) initParams(model string) (int, float32, float32, float32) {
 	}
 
 	var maxToken = noneGpt3MaxToken
-	if model == gogpt.GPT3TextDavinci003 {
+	if model == gogpt.GPT3Dot5Turbo {
 		maxToken = gpt3MaxToken
 	}
 
