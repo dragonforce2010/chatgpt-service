@@ -19,5 +19,5 @@ func (cr *ChatRouter) Init(router *gin.Engine) {
 	router.POST("/api/chat/v1", cr.handler.HandleChatV1)
 	// 使用public open api key pool
 	router.POST("/api/chat/v2", cr.handler.HandleChatV2)
-	router.POST("/api/chat/chatgpt-demo-for-apaas", cr.handler.HandleChatV2)
+	// router.POST("/api/chat/chatgpt-demo-for-apaas", cr.handler.HandleChatV2)
 }
