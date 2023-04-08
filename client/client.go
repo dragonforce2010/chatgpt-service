@@ -47,3 +47,7 @@ func (c *Client) initClient() *Client {
 func (c *Client) GetRandomOneClient() *gpt3.Client {
 	return c.ClientsPool[rand.Intn(len(c.ClientsPool))]
 }
+
+func (c *Client) GetUserClient(openAiKey string) *gpt3.Client {
+	return gpt3.NewClient(openAiKey)
+}

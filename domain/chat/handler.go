@@ -36,7 +36,7 @@ func (ch *ChatHandler) HandleChatV1(c *gin.Context) {
 		return
 	}
 
-	messages, respMessage, err := ch.sendChatRequest(chatGptRequest, c)
+	messages, respMessage, err := ch.sendChatRequest(chatGptRequest, c, false)
 	if err != nil {
 		fmt.Println("error happed", err.Error())
 		c.JSON(constant.HTTPStatusCodeInternalError, ChatGptResponse{
@@ -68,7 +68,7 @@ func (ch *ChatHandler) HandleChatV2(c *gin.Context) {
 		return
 	}
 
-	messages, respMessage, err := ch.sendChatRequest(chatGptRequest, c)
+	messages, respMessage, err := ch.sendChatRequest(chatGptRequest, c, true)
 	if err != nil {
 		fmt.Println("error happed", err.Error())
 		c.JSON(constant.HTTPStatusCodeInternalError, ChatGptResponse{
@@ -105,10 +105,10 @@ func (*ChatHandler) parseResponse(messages []gogpt.ChatCompletionMessage, respMe
 	return string(context), nil
 }
 
-func (ch *ChatHandler) sendChatRequest(chatGptRequest ChatGptRequest, c *gin.Context) ([]gogpt.ChatCompletionMessage, string, error) {
+func (ch *ChatHandler) sendChatRequest(chatGptRequest ChatGptRequest, c *gin.Context, useClientPool bool) ([]gogpt.ChatCompletionMessage, string, error) {
 	messages := ch.genChatMessages(chatGptRequest)
 
-	respMessage, err := ch.chatService.Chat(c, nil, messages, chatGptRequest.Model, true)
+	respMessage, err := ch.chatService.Chat(c, nil, messages, chatGptRequest, useClientPool)
 	if err != nil {
 		fmt.Println("error heppened", err.Error())
 		return messages, "", err

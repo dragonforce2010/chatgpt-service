@@ -19,17 +19,17 @@ func NewChatService(client *client.Client) *ChatService {
 	return &ChatService{client: client}
 }
 
-func (c *ChatService) Chat(ctx *gin.Context, client *gogpt.Client, messages []gogpt.ChatCompletionMessage, model string, useClientPool bool) (string, error) {
-	maxToken, temperature, presencePenalty, frequencyPenalty := c.initParams(model)
+func (c *ChatService) Chat(ctx *gin.Context, client *gogpt.Client, messages []gogpt.ChatCompletionMessage, chatGptRequest ChatGptRequest, useClientPool bool) (string, error) {
+	maxToken, temperature, presencePenalty, frequencyPenalty := c.initParams(chatGptRequest.Model)
 
 	if !useClientPool && client == nil {
-		return "", fmt.Errorf("GptClient is nil")
+		client = c.client.GetUserClient(chatGptRequest.OpenAiKey)
 	}
 
 	if useClientPool {
 		client = c.client.GetRandomOneClient()
 	}
-	return c.getChatResponse(client, ctx, messages, maxToken, model, temperature, presencePenalty, frequencyPenalty)
+	return c.getChatResponse(client, ctx, messages, maxToken, chatGptRequest.Model, temperature, presencePenalty, frequencyPenalty)
 }
 
 func (*ChatService) getChatResponse(client *gogpt.Client, ctx *gin.Context, messages []gogpt.ChatCompletionMessage, maxToken int, model string, temperature float32, presencePenalty float32, frequencyPenalty float32) (string, error) {
